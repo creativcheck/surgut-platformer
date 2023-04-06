@@ -21,12 +21,19 @@ namespace Player
 
             _controls.Player.Move.started += OnMoveInput;
             _controls.Player.Move.canceled += OnMoveInput;
+            _controls.Player.Jump.started += OnJumpImput;
+            _controls.Player.Jump.canceled += OnJumpImput;
         }
 
         private void UnBind()
         {
             _controls.Player.Move.started -= OnMoveInput;
             _controls.Player.Move.canceled -= OnMoveInput;
+        }
+
+        private void OnJumpImput(InputAction.CallbackContext context)
+        {
+            _player.SetJump(context.ReadValueAsButton());
         }
 
         private void OnMoveInput(InputAction.CallbackContext context)
