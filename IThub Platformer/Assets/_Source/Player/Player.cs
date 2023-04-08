@@ -1,6 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using Supporting;
 using UnityEngine;
 
 
@@ -16,19 +15,32 @@ namespace Player
         [SerializeField] private float _speed;
         [SerializeField] private float _jumpForce;
         [SerializeField] private float _groundCheckRadius;
+        [SerializeField] private float _firingDelay = 0.4f;
+
+        [SerializeField] private int _projectilesPoolAmount;
+        [SerializeField] private int _health = 3;
 
         [SerializeField] private LayerMask _groundLayer;
+        [SerializeField] private LayerMask _enemyLayer;
+
+        [SerializeField] private GameObject _projectilePrefab;
 
         [SerializeField] private Transform _groundPoint;
+        [SerializeField] private Transform _firePoint;
+
+        [SerializeField] private PlayerStatsView _HPView;
 
         private PlayerInput _playerInput;
         private PlayerMovement _playerMovement;
         private PlayerAnimator _playerAnimator;
+        private PlayerFireAbility _playerFire;
+        private PlayerHealth _playerHealth;
 
         private Vector2 _inputVector;
         private Vector3 _scaleForward, _scaleBackward;
         private bool _isGrounded;
         private bool _jumping;
+        private bool _firing;
         private bool _directionForward;
 
         void Start()
@@ -46,6 +58,8 @@ namespace Player
             _playerInput = new PlayerInput(this);
             _playerMovement = new PlayerMovement(_rigidbody2D, _jumpForce);
             _playerAnimator = new PlayerAnimator(_animator);
+            _playerFire = new PlayerFireAbility(_projectilesPoolAmount, _projectilePrefab, _firingDelay);
+            _playerHealth = new PlayerHealth(_HPView, _health);
         }
 
         private void InitScaleDirection()
@@ -82,6 +96,8 @@ namespace Player
         }
         #endregion
 
+
+        #region Сеттеры из инпута
         public void SetInput(Vector2 inputVector)
         {
             _inputVector = inputVector;
@@ -99,10 +115,16 @@ namespace Player
 
         }
 
+        public void SetFire(bool firing)
+        {
+            _firing = firing;
+        }
+
         public void SetJump(bool jumping)
         {
             _jumping = jumping;
         }
+        #endregion
 
         private void Flip()
         {
@@ -114,6 +136,7 @@ namespace Player
             _playerAnimator.SetGrounded(_isGrounded);
             _playerAnimator.SetSpeed(_inputVector.x);
 
+            _playerFire.TryFiring(_firing, _firePoint.position, _directionForward);
         }
 
         private void FixedUpdate()
@@ -122,6 +145,19 @@ namespace Player
 
             _playerMovement.Move(_inputVector.x * _speed);
             _playerMovement.Jump(_isGrounded, _jumping);
+        }
+
+        private void OnDestroy()
+        {
+            _playerInput.UnBind();
+        }
+
+        private void OnCollisionEnter2D(Collision2D collision)
+        {
+            if(Utils.IsInLayerMask(collision.gameObject.layer, _enemyLayer))
+            {
+                _playerHealth.ChangeHealth(-collision.gameObject.GetComponent<Enemy>().GetDamage());
+            }
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Player
         private const string GROUNDED = "Grounded";
 
         private readonly int _speedHash = Animator.StringToHash(SPEED);
-        private readonly int _groundedeHash = Animator.StringToHash(GROUNDED);
+        private readonly int _groundedHash = Animator.StringToHash(GROUNDED);
 
         private Animator _animator;
 
@@ -25,7 +25,7 @@ namespace Player
 
         public void SetGrounded(bool grounded)
         {
-            _animator.SetBool(_groundedeHash, grounded);
+            _animator.SetBool(_groundedHash, grounded);
         }
 
         public void SetSpeed(float speed)

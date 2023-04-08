@@ -23,12 +23,23 @@ namespace Player
             _controls.Player.Move.canceled += OnMoveInput;
             _controls.Player.Jump.started += OnJumpImput;
             _controls.Player.Jump.canceled += OnJumpImput;
+            _controls.Player.Fire.started += OnFireInput;
+            _controls.Player.Fire.canceled += OnFireInput;
         }
 
-        private void UnBind()
+        private void OnFireInput(InputAction.CallbackContext context)
+        {
+            _player.SetFire(context.ReadValueAsButton());
+        }
+
+        public void UnBind()
         {
             _controls.Player.Move.started -= OnMoveInput;
             _controls.Player.Move.canceled -= OnMoveInput;
+            _controls.Player.Jump.started -= OnJumpImput;
+            _controls.Player.Jump.canceled -= OnJumpImput;
+            _controls.Player.Fire.started -= OnFireInput;
+            _controls.Player.Fire.canceled -= OnFireInput;
         }
 
         private void OnJumpImput(InputAction.CallbackContext context)
